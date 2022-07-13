@@ -18,12 +18,6 @@ public class Weapon : MonoBehaviour
             TryShoot();
     }
 
-    public void StartShooting()
-    {
-        isShooting = true;
-        TryShoot();
-    }
-
     private void TryShoot()
     {
         if (Time.time - lastShootTime < interval) return;
@@ -40,8 +34,13 @@ public class Weapon : MonoBehaviour
         movable.PlayFromOffset();
     }
 
-    public void StopShooting()
+    public void SetShooting(bool value)
     {
-        isShooting = false;
+        if (isShooting == value) return;
+
+        var wasShooting = isShooting;
+        isShooting = value;
+        if (!wasShooting && isShooting)
+            TryShoot();
     }
 }

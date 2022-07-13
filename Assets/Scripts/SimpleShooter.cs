@@ -8,9 +8,6 @@ public class SimpleShooter : MonoBehaviour
     
     void Update()
     {
-        if (input.IsDown())
-            weapon.StartShooting();
-        if (input.IsUp())
-            weapon.StopShooting();
+        weapon.SetShooting(input.IsPressing());
     }
 }

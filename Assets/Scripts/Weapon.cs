@@ -18,7 +18,7 @@ public class Weapon : MonoBehaviour
             TryShoot();
     }
 
-    private void TryShoot()
+    public void TryShoot()
     {
         if (Time.time - lastShootTime < interval) return;
 

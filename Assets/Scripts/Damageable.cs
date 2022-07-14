@@ -20,9 +20,12 @@ public class Damageable : MonoBehaviour
             {
                 col.enabled = false;
             }
-            
-            hitEffect.Play();
-            hitEffect.transform.SetParent(null);
+
+            if (hitEffect != null)
+            {
+                hitEffect.Play();
+                hitEffect.transform.SetParent(null);
+            }
             // var main = hitEffect.main;
             // main.stopAction = ParticleSystemStopAction.Destroy;
             Destroy(gameObject);

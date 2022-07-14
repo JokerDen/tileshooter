@@ -12,6 +12,8 @@ public class LateFollower : MonoBehaviour
         
     }
 
+    public float smoothing;
+
     private void LateUpdate()
     {
         if (targets.Count > 0)
@@ -20,6 +22,8 @@ public class LateFollower : MonoBehaviour
             foreach (var target in targets)
                 pos += target.position;
             pos /= targets.Count;
+
+            pos = Vector3.Lerp(transform.position, pos, smoothing * Time.deltaTime);
             
             transform.position = pos;
         }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour
 {
@@ -37,6 +39,15 @@ public class Enemy : MonoBehaviour
         this.state = state;
         emotion.Show(state);
     }
+
+    /*private void OnTriggerEnter(Collider other)
+    {
+        var soundArea = other.GetComponent<SoundArea>();
+        if (soundArea != null)
+        {
+            transform.LookAt(soundArea.transform);
+        }
+    }*/
 
     private IEnumerator AI()
     {

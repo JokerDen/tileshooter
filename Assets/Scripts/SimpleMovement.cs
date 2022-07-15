@@ -30,15 +30,12 @@ public class SimpleMovement : MonoBehaviour
         return GetMoveInput(positive, 1) + GetMoveInput(negative, -1);
     }
 
-    private void FixedUpdate()
-    {
-        
-    }
-
     void Update()
     {
         movement.x = GetAxisInput(rightInput, leftInput);
         movement.z = GetAxisInput(upInput, downInput);
+
+        var move = Physics.gravity * Time.deltaTime;
 
         if (movement.magnitude > 0f)
         {
@@ -78,7 +75,11 @@ public class SimpleMovement : MonoBehaviour
                 transform.LookAt(transform.position + thisDiff);
 
             // character.Move(pos);
-            transform.position = pos;
+            // transform.position = pos;
+            // character.Move(thisDiff);
+            move += thisDiff;
         }
+
+        character.Move(move);
     }
 }

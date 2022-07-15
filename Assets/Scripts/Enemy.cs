@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     public enum State
     {
         Default = 0,
+        Warned = 50,
         Agro = 100
     }
 
@@ -24,9 +25,17 @@ public class Enemy : MonoBehaviour
 
     public int[] hostileTeams;
 
+    public Emotion emotion;
+
     private void Start()
     {
         StartCoroutine(AI());
+    }
+
+    private void SetState(State state)
+    {
+        this.state = state;
+        emotion.Show(state);
     }
 
     private IEnumerator AI()
@@ -40,7 +49,52 @@ public class Enemy : MonoBehaviour
                 target = forwardCast.GetTarget(hostileTeams);
 
                 if (target != null)
-                    state = State.Agro;
+                    SetState(State.Agro);
+                else
+                    continue;
+            }
+
+            if (target == null)
+            {
+                target = forwardCast.GetTarget(hostileTeams);
+                var angles = transform.localEulerAngles;
+                if (target == null)
+                {
+                    target = rightCast.GetTarget(hostileTeams);
+                    if (target != null)
+                    {
+                        angles.y += 45f;
+                    }
+                    else
+                    {
+                        target = leftCast.GetTarget(hostileTeams);
+                        if (target != null)
+                        {
+                            angles.y -= 45f;
+                        }
+                    }
+                }
+
+                transform.localEulerAngles = angles;
+            }
+
+            if (target == null)
+            {
+                var angles = transform.localEulerAngles;
+                if (Random.value > .5f)
+                    angles.y += 90f;
+                else
+                    angles.y -= 90f;
+                transform.localEulerAngles = angles;
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (state == State.Warned)
+            {
+                if (target == null)
+                    continue;
+                
+                SetState(State.Agro);
             }
 
             if (state == State.Agro)
@@ -48,8 +102,14 @@ public class Enemy : MonoBehaviour
                 yield return new WaitForSeconds(preShotDelay);
             
                 weapon.TryShoot();
+
+                if (target != null)
+                    target = null;
+                else
+                    SetState(State.Warned);
             
                 yield return new WaitForSeconds(postShotDelay);
+                continue;
             }
         }
     }

@@ -19,9 +19,17 @@ public class LateFollower : MonoBehaviour
         if (targets.Count > 0)
         {
             var pos = new Vector3();
+            int num = 0;
             foreach (var target in targets)
+            {
+                if (target == null) continue;
                 pos += target.position;
-            pos /= targets.Count;
+                num++;
+            }
+            
+            if (num < 1) return;
+            
+            pos /= num;
 
             pos = Vector3.Lerp(transform.position, pos, smoothing * Time.deltaTime);
             

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SimpleMovement : MonoBehaviour
@@ -12,6 +13,12 @@ public class SimpleMovement : MonoBehaviour
 
     public float speed;
     public float runSpeed;
+
+    public LayerMask castObstacles;
+
+    private Vector3 movement = Vector3.zero;
+
+    public CharacterController character;
     
     private int GetMoveInput(InputPressable input, int diff)
     {
@@ -23,22 +30,54 @@ public class SimpleMovement : MonoBehaviour
         return GetMoveInput(positive, 1) + GetMoveInput(negative, -1);
     }
 
+    private void FixedUpdate()
+    {
+        
+    }
+
     void Update()
     {
-        Vector3 movement = new Vector3(
-            GetAxisInput(rightInput, leftInput),
-            0,
-            GetAxisInput(upInput, downInput)
-        );
+        movement.x = GetAxisInput(rightInput, leftInput);
+        movement.z = GetAxisInput(upInput, downInput);
 
         if (movement.magnitude > 0f)
         {
             var thisSpeed = runInput.IsPressing() ? runSpeed : speed;
-            var pos = transform.position + movement.normalized * (thisSpeed * Time.deltaTime);
+            var thisStep = thisSpeed * Time.deltaTime;
+            var thisDiff = movement.normalized * thisStep;
+
+            float radius = .5f;
+            float offset = .1f;
+            float offsetRadius = radius + .1f;
+            Vector3 right = transform.right * radius;
+            
+            RaycastHit hit;
+            var pos = transform.position;
+            
+            /*if (Physics.Raycast(transform.position, thisDiff.normalized, out hit, offsetRadius + thisDiff.magnitude,
+                    castObstacles))
+            // if (Physics.SphereCast(transform.position, radius / 2f, movement.normalized, out hit, thisStep + radius / 2f, castObstacles))
+            {
+                // pos = hit.point + (radius / 2f) * hit.normal - thisDiff.normalized * (radius / 4f);
+                // pos = hit.point + radius  * hit.normal;
+                // pos = transform.position + (hit.point - transform.position - thisDiff.normalized * radius);
+                pos = hit.point - thisDiff.normalized * offsetRadius;
+            } else if (Physics.Raycast(transform.position + right, thisDiff.normalized, out hit,
+                           offset + thisDiff.magnitude, castObstacles))
+            {
+                pos = hit.point - thisDiff.normalized * offset - right;
+            } else if (Physics.Raycast(transform.position - right, thisDiff.normalized, out hit,
+                           offset + thisDiff.magnitude, castObstacles))
+            {
+                pos = hit.point - thisDiff.normalized * offset + right;
+            }
+            else*/
+                pos += thisDiff;
             
             if (!holdDirectionInput.IsPressing())
-                transform.LookAt(pos);
-            
+                transform.LookAt(transform.position + thisDiff);
+
+            // character.Move(pos);
             transform.position = pos;
         }
     }

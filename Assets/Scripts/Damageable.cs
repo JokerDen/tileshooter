@@ -3,10 +3,12 @@ using UnityEngine;
 public class Damageable : MonoBehaviour
 {
     public int health;
+    public bool invulnerable;
 
     public ParticleSystem hitEffect;
 
-    public bool invulnerable;
+    public int[] teams;
+    
     public void Hit(int damage)
     {
         if (invulnerable) return;

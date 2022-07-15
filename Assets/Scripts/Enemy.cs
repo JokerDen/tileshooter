@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,13 +8,21 @@ public class Enemy : MonoBehaviour
     public enum State
     {
         Default = 0,
+        Agro = 100
     }
 
     public State state;
 
     public CastForward forwardCast;
-    public CastForward leftCast;
     public CastForward rightCast;
+    public CastForward leftCast;
+
+    private Damageable target;
+
+    public float preShotDelay;
+    public float postShotDelay;
+
+    public int[] hostileTeams;
 
     private void Start()
     {
@@ -24,13 +31,26 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator AI()
     {
-        if (state == State.Default)
+        while (true)
         {
-            
-            
             yield return null;
+            
+            if (state == State.Default)
+            {
+                target = forwardCast.GetTarget(hostileTeams);
+
+                if (target != null)
+                    state = State.Agro;
+            }
+
+            if (state == State.Agro)
+            {
+                yield return new WaitForSeconds(preShotDelay);
+            
+                weapon.TryShoot();
+            
+                yield return new WaitForSeconds(postShotDelay);
+            }
         }
-        
-        
     }
 }

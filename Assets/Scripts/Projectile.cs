@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -11,6 +11,7 @@ public class Projectile : MonoBehaviour
     private float distance;
 
     public LayerMask hitMask;
+    public int[] hitTeams;
 
     public ParticleSystem finish;
 
@@ -18,62 +19,27 @@ public class Projectile : MonoBehaviour
 
     private List<Collider> hitted = new List<Collider>();
 
-    /*private Rigidbody body;
-
-    private void Start()
+    private bool IsValidHit(Damageable damageable)
     {
-        body = GetComponent<Rigidbody>();
-        
-    }
+        if (damageable == null) return false;
 
-    private void FixedUpdate()
-    {
-        body.velocity = transform.forward * speed;
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (damage <= 0) return;
-        if (hitted.Contains(collision.collider)) return;
-        
-        hitted.Add(collision.collider);
-        var damageable = collision.collider.GetComponentInParent<Damageable>();
-        if (damageable != null)
-            Hit(damageable);
-
-        if (damage <= 0)
+        if (damageable.teams.Length > 0)
         {
-            /*var contact = collision.GetContact(0);
-            Vector3 center = contact.point + radius * contact.normal;
-            transform.position = center;#1#
-            Finish();
+            foreach (var team in damageable.teams)
+            {
+                if (hitTeams.Contains(team))
+                    return true;
+            }
+
+            return false;
         }
+
+        return true;
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (damage <= 0) return;
-        if (hitted.Contains(other)) return;
-        
-        hitted.Add(other);
-        var damageable = other.GetComponentInParent<Damageable>();
-        if (damageable != null)
-            Hit(damageable);
-
-        if (damage <= 0)
-        {
-            /*var contact = collision.GetContact(0);
-            Vector3 center = contact.point + radius * contact.normal;
-            transform.position = center;#1#
-            Finish();
-        }
-    }*/
 
     private void Update()
     {
-        // return;
         var hits = Physics.OverlapSphere(transform.position, radius, hitMask);
-        // Debug.Log($"overlap {hits.Length}");
         for (int i = 0; i < hits.Length; i++)
         {
             var hit = hits[i];
@@ -83,7 +49,7 @@ public class Projectile : MonoBehaviour
             hitted.Add(hit);
             
             var damageable = hit.GetComponentInParent<Damageable>();
-            if (damageable != null)
+            if (IsValidHit(damageable))
                 Hit(damageable);
 
             if (damage <= 0)
@@ -99,25 +65,6 @@ public class Projectile : MonoBehaviour
 
         /*hits = Physics.OverlapCapsule(transform.position, pos, radius, hitMask);
         // Debug.Log($"capsule {hits.Length}");
-        for (int i = 0; i < hits.Length; i++)
-        {
-            var hit = hits[i];
-            if (damage <= 0) return;
-            if (hitted.Contains(hit)) continue;
-            
-            hitted.Add(hit);
-            
-            var damageable = hit.GetComponentInParent<Damageable>();
-            if (damageable != null)
-                Hit(damageable);
-
-            if (damage <= 0)
-            {
-                pos = rayHit.point + radius * rayHit.normal;
-                transform.position = pos;
-                Finish();
-                return;
-            }
         }*/
         
         var ray = new Ray(transform.position, transform.forward);
@@ -129,7 +76,7 @@ public class Projectile : MonoBehaviour
 
             hitted.Add(hit);
             var damageable = hit.GetComponentInParent<Damageable>();
-            if (damageable != null)
+            if (IsValidHit(damageable))
                 Hit(damageable);
             
             if (damage <= 0)

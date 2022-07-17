@@ -20,6 +20,13 @@ public class SimpleMovement : MonoBehaviour
 
     public CharacterController character;
     
+
+    public Animator anim;
+    public int legs;
+    private int leg;
+    private bool wasWalking;
+    private bool skipStep = true;
+
     private int GetMoveInput(InputPressable input, int diff)
     {
         return input.IsPressing() ? diff : 0;
@@ -81,5 +88,42 @@ public class SimpleMovement : MonoBehaviour
         }
 
         character.Move(move);
+        
     }
+
+    private void FixedUpdate()
+    {
+        
+        var walking = movement.magnitude > 0f;
+        if (!wasWalking && walking)
+        {
+            skipStep = true;
+        }
+        
+        anim.SetBool("Walk", walking);
+        anim.SetBool("Run", holdDirectionInput.IsPressing());
+        if (wasWalking && !walking)
+        {
+            leg++;
+            if (leg >= legs)
+                leg = 0;
+            anim.SetInteger("Leg", leg);
+        }
+
+        wasWalking = walking;
+    }
+
+    // by animator
+    /*public void Step()
+    {
+        if (skipStep)
+        {
+            skipStep = false;
+            return;
+        }
+        
+        // audioSource.PlayOneShot(audioClip, 0.5f + Random.value * .5f);
+        // audioSource.pitch = 0.5f + Random.value * 0.5f;
+        audioSource.PlayOneShot(audioClip);
+    }*/
 }

@@ -69037,6 +69037,31 @@ MonoBehaviour:
   character: {fileID: 328200886890208399}
   anim: {fileID: 6319057747442723518}
   legs: 2
+--- !u!114 &1427110133042949293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8667612974533650287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37fe7cf5b2f9d4f8b92bbd1657b3c97a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8352399844890321331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8667612974533650287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53870c8b4e9175d48a98f1dc47e42d78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapon: {fileID: 973107849}
 --- !u!4 &8667612974536551799 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3843961734305763986, guid: 9d8680078d1260645916855f53dea186, type: 3}

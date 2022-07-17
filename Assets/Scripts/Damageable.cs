@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Damageable : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class Damageable : MonoBehaviour
     public ParticleSystem hitEffect;
 
     public int[] teams;
+
+    public UnityEvent onDestroy;
     
     public void Hit(int damage)
     {
@@ -30,6 +33,7 @@ public class Damageable : MonoBehaviour
             }
             // var main = hitEffect.main;
             // main.stopAction = ParticleSystemStopAction.Destroy;
+            onDestroy.Invoke();
             Destroy(gameObject);
         }
     }

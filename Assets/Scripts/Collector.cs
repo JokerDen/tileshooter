@@ -6,4 +6,9 @@ public class Collector : MonoBehaviour
     {
         // Debug.Log("trigger collector");
     }
+
+    public void Collect(Collectable collectable)
+    {
+        
+    }
 }

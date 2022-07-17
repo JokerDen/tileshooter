@@ -68997,6 +68997,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input: {fileID: 725229580}
   weapon: {fileID: 1058908125}
+  mainWeapon: {fileID: 0}
 --- !u!114 &1299106974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69010,7 +69011,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 1964504531}
-  weapon: {fileID: 973107849}
+  weapon: {fileID: 0}
+  mainWeapon: {fileID: 8352399844890321331}
 --- !u!114 &1299106975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69030,7 +69032,7 @@ MonoBehaviour:
   holdDirectionInput: {fileID: 1969684250}
   runInput: {fileID: 1864462651}
   speed: 5
-  runSpeed: 8
+  runSpeed: 9
   castObstacles:
     serializedVersion: 2
     m_Bits: 128

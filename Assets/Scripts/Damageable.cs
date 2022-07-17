@@ -10,6 +10,7 @@ public class Damageable : MonoBehaviour
 
     public int[] teams;
 
+    public UnityEvent onHit;
     public UnityEvent onDestroy;
     
     public void Hit(int damage)
@@ -17,6 +18,7 @@ public class Damageable : MonoBehaviour
         if (invulnerable) return;
         
         health -= damage;
+        onHit.Invoke();
         
         if (health <= 0)
         {

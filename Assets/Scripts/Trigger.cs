@@ -14,7 +14,8 @@ public class Trigger : MonoBehaviour
         if (oneTime && triggered) return;
 
         triggered = true;
-        
+        // Debug.Log("Trigged");
+  
         onTrigger.Invoke();
     }
 }

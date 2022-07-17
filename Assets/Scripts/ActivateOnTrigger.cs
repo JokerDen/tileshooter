@@ -15,6 +15,7 @@ public class ActivateOnTrigger : MonoBehaviour
 
     private void ActivateTargets()
     {
+        // Debug.Log("Activate on Trigger");
         foreach (var target in targets)
         {
             target.SetActive(targetActivity);

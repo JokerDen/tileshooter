@@ -16,8 +16,11 @@ public class Projectile : MonoBehaviour
     public ParticleSystem finish;
 
     public int damage;
+    public bool constantDamage;
 
     private List<Collider> hitted = new List<Collider>();
+
+    public Fire fire;
 
     private bool IsValidHit(Damageable damageable)
     {
@@ -99,7 +102,16 @@ public class Projectile : MonoBehaviour
     private void Hit(Damageable target)
     {
         var hit = Mathf.Min(damage, target.health);
-        damage -= hit;
+        if (!constantDamage)
+            damage -= hit;
+        if (fire != null)
+        {
+            Debug.Log("fire hit");
+            var item = Instantiate(fire, target.transform.position, Quaternion.identity, target.transform);
+            item.target = target;
+            item.gameObject.SetActive(true);
+        }
+            
         target.Hit(hit);
     }
 

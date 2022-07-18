@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class SimpleMovement : MonoBehaviour
@@ -10,22 +9,12 @@ public class SimpleMovement : MonoBehaviour
     
     public InputPressable holdDirectionInput;
     public InputPressable runInput;
-
-    public float speed;
-    public float runSpeed;
-
+    
     public LayerMask castObstacles;
 
     private Vector3 movement = Vector3.zero;
 
-    public CharacterController character;
-    
-
-    public Animator anim;
-    public int legs;
-    private int leg;
-    private bool wasWalking;
-    private bool skipStep = true;
+    public CharacterMovement characterMovement;
 
     private int GetMoveInput(InputPressable input, int diff)
     {
@@ -42,9 +31,16 @@ public class SimpleMovement : MonoBehaviour
         movement.x = GetAxisInput(rightInput, leftInput);
         movement.z = GetAxisInput(upInput, downInput);
 
-        var move = Physics.gravity * Time.deltaTime;
+        // var move = Physics.gravity * Time.deltaTime;
+        // characterMovement.UpdateMoveDirection(movement, runInput.IsPressing());
+        characterMovement.running = runInput.IsPressing();
+        characterMovement.MoveToPoint(transform.position + Vector3.ClampMagnitude(movement, 1f));
+        characterMovement.UpdateMove();
+        
+        if (movement.magnitude > 0f && !holdDirectionInput.IsPressing())
+            transform.LookAt(transform.position + movement);
 
-        if (movement.magnitude > 0f)
+        /*if (movement.magnitude > 0f)
         {
             var thisSpeed = runInput.IsPressing() ? runSpeed : speed;
             var thisStep = thisSpeed * Time.deltaTime;
@@ -75,7 +71,7 @@ public class SimpleMovement : MonoBehaviour
             {
                 pos = hit.point - thisDiff.normalized * offset + right;
             }
-            else*/
+            else#1#
                 pos += thisDiff;
             
             if (!holdDirectionInput.IsPressing())
@@ -85,45 +81,6 @@ public class SimpleMovement : MonoBehaviour
             // transform.position = pos;
             // character.Move(thisDiff);
             move += thisDiff;
-        }
-
-        character.Move(move);
-        
+        }*/
     }
-
-    private void FixedUpdate()
-    {
-        
-        var walking = movement.magnitude > 0f;
-        if (!wasWalking && walking)
-        {
-            skipStep = true;
-        }
-        
-        anim.SetBool("Walk", walking);
-        anim.SetBool("Run", holdDirectionInput.IsPressing());
-        if (wasWalking && !walking)
-        {
-            leg++;
-            if (leg >= legs)
-                leg = 0;
-            anim.SetInteger("Leg", leg);
-        }
-
-        wasWalking = walking;
-    }
-
-    // by animator
-    /*public void Step()
-    {
-        if (skipStep)
-        {
-            skipStep = false;
-            return;
-        }
-        
-        // audioSource.PlayOneShot(audioClip, 0.5f + Random.value * .5f);
-        // audioSource.pitch = 0.5f + Random.value * 0.5f;
-        audioSource.PlayOneShot(audioClip);
-    }*/
 }

@@ -11,7 +11,8 @@ public class Enemy : MonoBehaviour
     {
         Default = 0,
         Warned = 50,
-        Agro = 100
+        Attacking = 100,
+        Alerted = 150,
     }
 
     public State state;
@@ -24,104 +25,274 @@ public class Enemy : MonoBehaviour
 
     public float preShotDelay;
     public float postShotDelay;
+    public float alertLookDuration;
+    public int alertLookNum;
+    private int alertCurrentLookNum;
+    public float distractedLookDuration;
+    public float passiveDelay;
 
     public int[] hostileTeams;
 
     public Emotion emotion;
 
+    public Route route;
+    private int routeIndex;
+    private float waitDuration;
+
+    private Coroutine ai;
+
+    public DisctractionListener distraction;
+
+    public CharacterMovement movement;
+
     private void Start()
     {
-        StartCoroutine(AI());
+        distraction.onDistraction.AddListener(HandleDistraction);
+        StartAI();
+    }
+
+    private void HandleDistraction(DistractionSource arg0)
+    {
+        if (state != State.Attacking)
+        {
+            var dir = arg0.transform.position - transform.position;
+            LookToDirection(dir);
+            
+            if (state != State.Alerted)
+                SetState(State.Warned);
+        }
+    }
+
+    private void LookToDirection(Vector3 direction)
+    {
+        var angle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
+        angle = Mathf.Round(angle / 45f) * 45f;
+        var angles = transform.localEulerAngles;
+        angles.y = angle;
+        transform.localEulerAngles = angles;
+    }
+
+    private void StartAI()
+    {
+        if (ai != null)
+            StopCoroutine(ai);
+        ai = StartCoroutine(AI());
     }
 
     private void SetState(State state)
     {
+        if (this.state == state) return;
+        movement.MoveToPoint(transform.position);
         this.state = state;
         emotion.Show(state);
+        StartAI();
     }
 
-    /*private void OnTriggerEnter(Collider other)
+    private IEnumerator PassiveAI()
     {
-        var soundArea = other.GetComponent<SoundArea>();
-        if (soundArea != null)
+        RoutePoint routePoint = null;
+        waitDuration = passiveDelay;
+        while (true)
         {
-            transform.LookAt(soundArea.transform);
-        }
-    }*/
+            target = forwardCast.GetTarget(hostileTeams);
 
-    private IEnumerator AI()
+            if (target != null)
+            {
+                SetState(State.Attacking);
+                yield break;
+            }
+
+            float time = Time.time;
+            yield return new WaitForFixedUpdate();
+            var dt = Time.time - time;
+
+            if (routePoint != null)
+            {
+                var routePos = routePoint.transform.position;
+                var diff = routePos - transform.position;
+                
+                if (diff.magnitude < 0.05)
+                {
+                    waitDuration = routePoint.waitDuration;
+                    transform.rotation = routePoint.transform.rotation;
+                    routePoint = null;
+                    movement.MoveToPoint(transform.position);
+                }
+                else
+                {
+                    LookToDirection(diff);
+                    movement.MoveToPoint(routePos);
+                    continue;
+                }
+            }
+
+            if (route != null)
+            {
+                waitDuration -= dt;
+
+                if (waitDuration <= 0f)
+                {
+                    routeIndex = route.GetNextIndex(routeIndex);
+                    routePoint = route.GetPath(routeIndex);
+                }
+            }
+        }
+    }
+
+    private IEnumerator AttackingAI()
     {
         while (true)
         {
-            yield return null;
+            yield return new WaitForSeconds(preShotDelay);
             
-            if (state == State.Default)
-            {
-                target = forwardCast.GetTarget(hostileTeams);
+            weapon.TryShoot();
 
-                if (target != null)
-                    SetState(State.Agro);
-                else
-                    continue;
-            }
+            yield return new WaitForSeconds(postShotDelay);
+
+            target = forwardCast.GetTarget(hostileTeams);
 
             if (target == null)
             {
-                target = forwardCast.GetTarget(hostileTeams);
-                var angles = transform.localEulerAngles;
-                if (target == null)
-                {
-                    target = rightCast.GetTarget(hostileTeams);
-                    if (target != null)
-                    {
-                        angles.y += 45f;
-                    }
-                    else
-                    {
-                        target = leftCast.GetTarget(hostileTeams);
-                        if (target != null)
-                        {
-                            angles.y -= 45f;
-                        }
-                    }
-                }
+                SetState(State.Alerted);
+                yield break;
+            }
+        }
+    }
 
-                transform.localEulerAngles = angles;
+    private void ResetAlertLook()
+    {
+        waitDuration = alertLookDuration;
+        alertCurrentLookNum = alertLookNum;
+    }
+
+    private IEnumerator AlertedAI()
+    {
+        ResetAlertLook();
+        while (true)
+        {
+            target = forwardCast.GetTarget(hostileTeams);
+            if (target != null)
+            {
+                SetState(State.Attacking);
+                yield break;
             }
 
-            if (target == null)
+            target = rightCast.GetTarget(hostileTeams);
+            if (target != null)
             {
-                var angles = transform.localEulerAngles;
-                if (Random.value > .5f)
-                    angles.y += 90f;
-                else
-                    angles.y -= 90f;
-                transform.localEulerAngles = angles;
-                yield return new WaitForSeconds(1f);
-            }
-
-            if (state == State.Warned)
-            {
-                if (target == null)
-                    continue;
-                
-                SetState(State.Agro);
-            }
-
-            if (state == State.Agro)
-            {
-                yield return new WaitForSeconds(preShotDelay);
-            
-                weapon.TryShoot();
-
-                if (target != null)
-                    target = null;
-                else
-                    SetState(State.Warned);
-            
-                yield return new WaitForSeconds(postShotDelay);
+                Rotate(1);
+                ResetAlertLook();
                 continue;
             }
+
+            target = leftCast.GetTarget(hostileTeams);
+            if (target != null)
+            {
+                Rotate(-1);
+                ResetAlertLook();
+                continue;
+            }
+            
+            float time = Time.time;
+            yield return new WaitForFixedUpdate();
+            var dt = Time.time - time;
+
+            waitDuration -= dt;
+
+            if (waitDuration <= 0f)
+            {
+                if (alertCurrentLookNum <= 0)
+                {
+                    SetState(State.Warned);
+                    yield break;
+                }
+
+                int dir = Random.value > .5f ? 1 : -1;
+                Rotate(dir * Random.Range(1, 2 + 1));
+                
+                waitDuration = alertLookDuration;
+                alertCurrentLookNum--;
+            }
+        }
+    }
+
+    private IEnumerator WarnedAI()
+    {
+        waitDuration = distractedLookDuration;
+        alertCurrentLookNum = 1;
+        while (true)
+        {
+            if (forwardCast.GetTarget(hostileTeams) != null)
+            
+            target = forwardCast.GetTarget(hostileTeams);
+            if (target != null)
+            {
+                SetState(State.Attacking);
+                yield break;
+            }
+
+            target = rightCast.GetTarget(hostileTeams);
+            if (target != null)
+            {
+                Rotate(1);
+                SetState(State.Attacking);
+                continue;
+            }
+
+            target = leftCast.GetTarget(hostileTeams);
+            if (target != null)
+            {
+                Rotate(-1);
+                SetState(State.Attacking);
+                continue;
+            }
+            
+            float time = Time.time;
+            yield return new WaitForFixedUpdate();
+            var dt = Time.time - time;
+
+            waitDuration -= dt;
+
+            if (waitDuration <= 0f)
+            {
+                if (alertCurrentLookNum <= 0)
+                {
+                    SetState(State.Default);
+                    yield break;
+                }
+
+                int dir = Random.value > .5f ? 1 : -1;
+                Rotate(dir * Random.Range(1, 1 + 1));
+                
+                waitDuration = alertLookDuration;
+                alertCurrentLookNum--;
+            }
+        }
+    }
+
+    private void Rotate(int directionSteps)
+    {
+        var angles = transform.localEulerAngles;
+        angles.y += directionSteps * 45f;
+        transform.localEulerAngles = angles;
+    }
+
+    private IEnumerator AI()
+    {
+        yield return null;
+        while (true)
+        {
+            if (state == State.Default)
+                yield return PassiveAI();
+
+            if (state == State.Attacking)
+                yield return AttackingAI();
+
+            if (state == State.Alerted)
+                yield return AlertedAI();
+            
+            if (state == State.Warned)
+                yield return WarnedAI();
         }
     }
 }

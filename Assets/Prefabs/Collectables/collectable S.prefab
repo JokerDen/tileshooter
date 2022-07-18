@@ -5560,6 +5560,8 @@ MonoBehaviour:
   hitTeams: 0a000000
   finish: {fileID: 3190672802378110240}
   damage: 10
+  constantDamage: 0
+  fire: {fileID: 0}
 --- !u!1 &2254426984777971758
 GameObject:
   m_ObjectHideFlags: 0
@@ -10499,6 +10501,8 @@ MonoBehaviour:
   hitTeams: 0a000000
   finish: {fileID: 8701427810857517179}
   damage: 10
+  constantDamage: 0
+  fire: {fileID: 0}
 --- !u!1 &2284944764979113206
 GameObject:
   m_ObjectHideFlags: 0
@@ -20908,6 +20912,8 @@ MonoBehaviour:
   hitTeams: 0a000000
   finish: {fileID: 4301928906544302886}
   damage: 10
+  constantDamage: 0
+  fire: {fileID: 0}
 --- !u!1 &4088511188763503476
 GameObject:
   m_ObjectHideFlags: 0
@@ -30683,8 +30689,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5602920196559168012}
-  - component: {fileID: 6702176352302857196}
   - component: {fileID: 4366800850112425633}
+  - component: {fileID: 187854032317147727}
   m_Layer: 9
   m_Name: Sound
   m_TagString: Untagged
@@ -30707,19 +30713,6 @@ Transform:
   m_Father: {fileID: 2414239978785297498}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &6702176352302857196
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5310873462220673934}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4366800850112425633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30733,6 +30726,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 0
+--- !u!114 &187854032317147727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5310873462220673934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f035ab9731c9498e9f8a3729b978b9a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 8
 --- !u!1 &5427941614876466033
 GameObject:
   m_ObjectHideFlags: 0
@@ -30851,6 +30857,8 @@ MonoBehaviour:
   hitTeams: 0a000000
   finish: {fileID: 5514104211780531391}
   damage: 10
+  constantDamage: 0
+  fire: {fileID: 0}
 --- !u!1 &6987678829785230305
 GameObject:
   m_ObjectHideFlags: 0
@@ -30959,6 +30967,8 @@ MonoBehaviour:
   hitTeams: 0a000000
   finish: {fileID: 6461412920773079106}
   damage: 10
+  constantDamage: 0
+  fire: {fileID: 0}
 --- !u!1 &7365223551349419679
 GameObject:
   m_ObjectHideFlags: 0
